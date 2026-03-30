@@ -5,13 +5,28 @@ namespace OrderProcessor.Services;
 
 public class CheckStockStep : IOrderStep
 {
-    public void Execute(OrderDetails orderDetails)
-    {
-        Console.WriteLine("Check Stock");
+    private readonly ILogger _logger;
 
-        bool isAvailable = true;
+    public CheckStockStep(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public async Task ExecuteAsync(IOrderContext context, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Checking stock...");
+
+        await Task.Delay(200, cancellationToken); // simulate I/O work
+
+        // Dummy stock check
+        var isAvailable = true;
 
         if (!isAvailable)
             throw new InvalidOperationException("Product is out of stock.");
+
+        context.StockAvailable = true;
+        context.Notes.Add("Stock is available.");
+
+        _logger.LogInformation("Stock check completed.");
     }
 }

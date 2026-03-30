@@ -1,8 +1,6 @@
-﻿using OrderProcessor.Models;
-
-namespace OrderProcessor.Interfaces;
+﻿namespace OrderProcessor.Interfaces;
 
 public interface IOrderStep
 {
-    void Execute(OrderDetails orderDetails);
+    Task ExecuteAsync(IOrderContext context, CancellationToken cancellationToken = default);
 }

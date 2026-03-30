@@ -5,11 +5,27 @@ namespace OrderProcessor.Services;
 
 public class CreateInvoiceStep : IOrderStep
 {
-    public void Execute(OrderDetails orderDetails)
-    {
-        Console.WriteLine("Create Invoice");
+    private readonly ILogger _logger;
 
-        var finalPrice = (orderDetails.UnitPrice * orderDetails.Quantity) - orderDetails.Discount;
-        Console.WriteLine($"Invoice created for OrderId: {orderDetails.OrderId}, Amount: {finalPrice:C}");
+    public CreateInvoiceStep(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public async Task ExecuteAsync(IOrderContext context, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Creating invoice...");
+
+        if (!context.PaymentAccepted)
+            throw new InvalidOperationException("Cannot create invoice before payment is accepted.");
+
+        await Task.Delay(100, cancellationToken);
+
+        var finalPrice = (context.Order.UnitPrice * context.Order.Quantity) - context.Order.Discount;
+        context.Order.Price = finalPrice;
+        context.InvoiceNumber = $"INV-{DateTime.UtcNow:yyyyMMddHHmmss}-{context.Order.OrderId}";
+        context.Notes.Add($"Invoice created: {context.InvoiceNumber}");
+
+        _logger.LogInformation($"Invoice created successfully. Invoice Number: {context.InvoiceNumber}");
     }
 }

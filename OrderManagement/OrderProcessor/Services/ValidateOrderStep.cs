@@ -5,23 +5,35 @@ namespace OrderProcessor.Services;
 
 public class ValidateOrderStep : IOrderStep
 {
-    public void Execute(OrderDetails orderDetails)
+    private readonly ILogger _logger;
+
+    public ValidateOrderStep(ILogger logger)
     {
-        Console.WriteLine("Validate Order");
+        _logger = logger;
+    }
 
-        if (orderDetails == null)
-            throw new ArgumentNullException(nameof(orderDetails));
+    public Task ExecuteAsync(IOrderContext context, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Validating order...");
 
-        if (string.IsNullOrWhiteSpace(orderDetails.ProductName))
+        var order = context.Order;
+
+        if (string.IsNullOrWhiteSpace(order.ProductName))
             throw new ArgumentException("Product name is required.");
 
-        if (orderDetails.Quantity <= 0)
+        if (order.Quantity <= 0)
             throw new ArgumentException("Quantity must be greater than zero.");
 
-        if (orderDetails.UnitPrice <= 0)
+        if (order.UnitPrice <= 0)
             throw new ArgumentException("Unit price must be greater than zero.");
 
-        if (string.IsNullOrWhiteSpace(orderDetails.Email))
-            throw new ArgumentException("Email is required.");
+        if (string.IsNullOrWhiteSpace(order.Email))
+            throw new ArgumentException("Customer email is required.");
+
+        context.IsValid = true;
+        context.Notes.Add("Order validation passed.");
+
+        _logger.LogInformation("Order validation completed.");
+        return Task.CompletedTask;
     }
 }
