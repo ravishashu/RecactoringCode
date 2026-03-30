@@ -3,9 +3,9 @@ using OrderProcessor.Models;
 
 namespace OrderProcessor.Services;
 
-public class StockUpdater : IStockUpdater
+public class UpdateStockStep : IOrderStep
 {
-    public void UpdateStock(OrderDetails orderDetails)
+    public void Execute(OrderDetails orderDetails)
     {
         Console.WriteLine("Update Stock");
     }

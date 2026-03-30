@@ -1,32 +1,43 @@
-﻿using OrderProcessor;
+﻿using OrderProcessor.Interfaces;
 using OrderProcessor.Models;
 using OrderProcessor.Services;
 
 Console.WriteLine("Order Start");
 
-var orderProcessor = new OrderProcessor.Services.OrderProcessor(
-    new OrderValidator(),
-    new StockChecker(),
-    new PaymentService(),
-    new StockUpdater(),
-    new InvoiceService(),
-    new EmailService());
-
-var order = new OrderDetails
+var orderDetails = new OrderDetails
 {
     Id = 1,
     OrderId = 1001,
-    ProductName = "Laptop",
-    UnitPrice = 1000m,
-    Quantity = 1,
-    Discount = 50m,
-    Price = 950m,
+    ProductName = "Wireless Mouse",
+    UnitPrice = 25.99m,
+    Quantity = 2,
+    Discount = 5.00m,
+    Price = 46.98m,
     Email = "customer@example.com",
     Phone = "9876543210",
-    Address = "10 Downing Street, London",
-    PaymentDetails = "Credit Card"
+    Address = "123 High Street, London, UK",
+    PaymentDetails = "Paid via Credit Card"
 };
 
-orderProcessor.ProcessOrder(order);
+var steps = new List<IOrderStep>
+{
+    new ValidateOrderStep(),
+    new CheckStockStep(),
+    new AcceptPaymentStep(),
+    new UpdateStockStep(),
+    new CreateInvoiceStep(),
+    new SendEmailStep()
+};
+
+var orderProcessor = new OrderProcessor.Services.OrderProcessor(steps);
+
+try
+{
+    orderProcessor.ProcessOrder(orderDetails);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error processing order: {ex.Message}");
+}
 
 Console.WriteLine("Order End");

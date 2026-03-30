@@ -3,26 +3,24 @@ using OrderProcessor.Models;
 
 namespace OrderProcessor.Services;
 
-public class OrderProcessor(
-    IOrderValidator orderValidator,
-    IStockChecker stockChecker,
-    IPaymentService paymentService,
-    IStockUpdater stockUpdater,
-    IInvoiceService invoiceService,
-    IEmailService emailService)
-    : IOrderProcessor
+public class OrderProcessor
 {
-    
+    private readonly IEnumerable<IOrderStep> _steps;
+
+    public OrderProcessor(IEnumerable<IOrderStep> steps)
+    {
+        _steps = steps;
+    }
+
     public void ProcessOrder(OrderDetails orderDetails)
     {
-        Console.WriteLine("Process Order");
+        Console.WriteLine("Process Order Started");
 
-        orderValidator.Validate(orderDetails);
-        stockChecker.CheckStock(orderDetails);
-        paymentService.AcceptPayment(orderDetails);
-        stockUpdater.UpdateStock(orderDetails);
-        invoiceService.CreateInvoice(orderDetails);
-        emailService.SendEmail(orderDetails);
-        
+        foreach (var step in _steps)
+        {
+            step.Execute(orderDetails);
+        }
+
+        Console.WriteLine("Process Order Completed");
     }
 }

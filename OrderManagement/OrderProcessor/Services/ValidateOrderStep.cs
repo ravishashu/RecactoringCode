@@ -3,9 +3,9 @@ using OrderProcessor.Models;
 
 namespace OrderProcessor.Services;
 
-public class OrderValidator : IOrderValidator
+public class ValidateOrderStep : IOrderStep
 {
-    public void Validate(OrderDetails orderDetails)
+    public void Execute(OrderDetails orderDetails)
     {
         Console.WriteLine("Validate Order");
 
@@ -20,5 +20,8 @@ public class OrderValidator : IOrderValidator
 
         if (orderDetails.UnitPrice <= 0)
             throw new ArgumentException("Unit price must be greater than zero.");
+
+        if (string.IsNullOrWhiteSpace(orderDetails.Email))
+            throw new ArgumentException("Email is required.");
     }
 }
