@@ -4,3 +4,5 @@
 
 /OrderProcessing/obj
 /.vs
+/OrderManagement/OrderProcessor/bin/Debug/net8.0
+/OrderManagement/OrderProcessor/obj
